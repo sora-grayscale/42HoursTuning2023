@@ -54,7 +54,7 @@ export const insertMatchGroup = async (matchGroupDetail: MatchGroupDetail) => {
   }
 };
 
-export const getMatchGroupDetailByMatchGroupId = async (
+/* export const getMatchGroupDetailByMatchGroupId = async (
   matchGroupId: string,
   status?: string
 ): Promise<MatchGroupDetail | undefined> => {
@@ -86,6 +86,60 @@ export const getMatchGroupDetailByMatchGroupId = async (
 
   return convertToMatchGroupDetail(matchGroup[0]);
 };
+ */
+
+export const getMatchGroupDetailByMatchGroupId = async (
+  matchGroupId: string,
+  status?: string
+): Promise<MatchGroupDetail | undefined> => {
+  let query = `
+    SELECT
+      mg.match_group_id,
+      mg.match_group_name,
+      mg.description,
+      mg.status,
+      mg.created_by,
+      mg.created_at,
+      GROUP_CONCAT(mgm.user_id) AS member_ids
+    FROM
+      match_group AS mg
+    INNER JOIN match_group_member AS mgm ON mgm.match_group_id = mg.match_group_id
+    WHERE
+      mg.match_group_id = ?
+      ${status === "open" ? "AND mg.status = 'open'" : ""}
+    GROUP BY
+      mg.match_group_id
+  `;
+
+  const [matchGroup] = await pool.query<RowDataPacket[]>(query, [matchGroupId]);
+
+  if (matchGroup.length === 0) {
+    return;
+  }
+
+  const memberIds = matchGroup[0].member_ids.split(",");
+  const searchedUsers = await getUsersByUserIds(memberIds);
+
+  const members: User[] = searchedUsers.map((searchedUser) => {
+    const { kana: _kana, entryDate: _entryDate, ...rest } = searchedUser;
+    return rest;
+  });
+
+  const matchGroupDetail: MatchGroupDetail = {
+    matchGroupId: matchGroup[0].match_group_id,
+    matchGroupName: matchGroup[0].match_group_name,
+    description: matchGroup[0].description,
+    status: matchGroup[0].status,
+    createdBy: matchGroup[0].created_by,
+    createdAt: matchGroup[0].created_at,
+    members: members,
+  };
+
+  return matchGroupDetail;
+};
+
+
+
 
 export const getMatchGroupIdsByUserId = async (
   userId: string
