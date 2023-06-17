@@ -4,7 +4,7 @@ import { MatchGroup, MatchGroupDetail, User } from "../../model/types";
 import { getUsersByUserIds } from "../users/repository";
 import { convertToMatchGroupDetail } from "../../model/utils";
 
-export const hasSkillNameRecord = async (
+/* export const hasSkillNameRecord = async (
   skillName: string
 ): Promise<boolean> => {
   const [rows] = await pool.query<RowDataPacket[]>(
@@ -12,7 +12,17 @@ export const hasSkillNameRecord = async (
 	[skillName]
   );
   return rows.length > 0;
+}; */
+
+export const hasSkillNameRecord = async (skillName: string): Promise<boolean> => {
+  const [rows] = await pool.query<RowDataPacket[]>(
+    "SELECT EXISTS(SELECT 1 FROM skill WHERE skill_name = ? LIMIT 1) AS skillExists",
+    [skillName]
+  );
+  return !!rows[0].skillExists;
 };
+
+
 
 export const getUserIdsBeforeMatched = async (
   userId: string
