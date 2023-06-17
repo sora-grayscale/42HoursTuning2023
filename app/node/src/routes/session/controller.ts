@@ -1,7 +1,11 @@
+
 import express from "express";
-import { execSync } from "child_process";
 import { v4 as uuidv4 } from "uuid";
-import { getUserIdByMailAndPassword } from "../users/repository";
+import { createHash } from "crypto";
+import {
+  getUserIdByMailAndPassword,
+  getUserByUserId,
+} from "../users/repository";
 import {
   getSessionByUserId,
   createSession,
@@ -34,13 +38,10 @@ sessionRouter.post(
 
     const { mail, password }: { mail: string; password: string } = req.body;
 
-    const hashPassword = execSync(
-      `echo -n ${password} | shasum -a 256 | awk '{printf $1}'`,
-      { shell: "/bin/bash" }
-    ).toString();
+    const hashedPassword = createHash("sha256").update(password).digest("hex");
 
     try {
-      const userId = await getUserIdByMailAndPassword(mail, hashPassword);
+      const userId = await getUserIdByMailAndPassword(mail, hashedPassword);
       if (!userId) {
         res.status(401).json({
           message: "メールアドレスまたはパスワードが正しくありません。",
@@ -49,8 +50,17 @@ sessionRouter.post(
         return;
       }
 
+      const user = await getUserByUserId(userId);
+      if (!user) {
+        res.status(404).json({
+          message: "指定されたユーザーは存在しません。",
+        });
+        console.warn("specified user does not exist");
+        return;
+      }
+
       const session = await getSessionByUserId(userId);
-      if (session !== undefined) {
+      if (session) {
         res.cookie("SESSION_ID", session.sessionId, {
           httpOnly: true,
           path: "/",
@@ -92,9 +102,25 @@ sessionRouter.delete(
     next: express.NextFunction
   ) => {
     try {
-      const userId = req.headers["X-DA-USER-ID"] as string;
+      const sessionId = req.cookies["SESSION_ID"];
+      if (!sessionId) {
+        res.status(400).json({
+          message: "セッションが見つかりません。",
+        });
+        console.warn("session ID is missing");
+        return;
+      }
 
-      await deleteSessions(userId);
+      const session = await getSessionBySessionId(sessionId);
+      if (!session) {
+        res.status(404).json({
+          message: "指定されたセッションは存在しません。",
+        });
+        console.warn("specified session does not exist");
+        return;
+      }
+
+      await deleteSessions(session.userId);
       res.clearCookie("SESSION_ID", { httpOnly: true, path: "/" });
       res.status(204).send();
       console.log("successfully logged out");
@@ -103,3 +129,4 @@ sessionRouter.delete(
     }
   }
 );
+
