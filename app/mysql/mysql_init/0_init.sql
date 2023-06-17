@@ -91,3 +91,31 @@ CREATE TABLE `match_group_member` (
     PRIMARY KEY (`match_group_id`, `user_id`)
 );
 ALTER TABLE match_group_member ADD INDEX idx_user_id (user_id);
+
+
+-- `user`テーブル
+ALTER TABLE `user` ADD INDEX idx_employee_id (employee_id);
+ALTER TABLE `user` ADD INDEX idx_mail (mail);
+ALTER TABLE `user` ADD INDEX idx_office_id (office_id);
+
+-- `session`テーブル
+ALTER TABLE `session` ADD INDEX idx_created_at (created_at);
+
+-- `department`テーブル
+ALTER TABLE `department` ADD INDEX idx_department_name (department_name);
+
+-- `role`テーブル
+ALTER TABLE `role` ADD INDEX idx_role_name (role_name);
+
+-- `department_role_member`テーブル
+ALTER TABLE `department_role_member` ADD INDEX idx_user_id (user_id);
+
+-- `office`テーブル
+ALTER TABLE `office` ADD INDEX idx_office_name (office_name);
+
+-- `file`テーブル
+ALTER TABLE `file` ADD INDEX idx_path (path);
+
+-- `match_group`テーブル
+ALTER TABLE `match_group` ADD INDEX idx_created_by (created_by);
+
