@@ -36,7 +36,7 @@ export const getSessionBySessionId = async (
   sessionId: string
 ): Promise<Session | undefined> => {
   const [session] = await pool.query<RowDataPacket[]>(
-    "SELECT * FROM session WHERE session_id = ?",
+    "SELECT session_id  FROM session WHERE session_id = ?",
     [sessionId]
   );
   if (session.length === 0) {
