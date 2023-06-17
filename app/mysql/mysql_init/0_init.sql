@@ -58,7 +58,7 @@ CREATE TABLE `file` (
     `path` VARCHAR(1024) NOT NULL,
     PRIMARY KEY (`file_id`)
 );
-ALTER TABLE file ADD INDEX idx_file_name (file_name), ADD INDEX idx_file_id (file_id);
+-- ALTER TABLE file ADD INDEX idx_file_name (file_name), ADD INDEX idx_file_id (file_id);
 
 
 CREATE TABLE `skill` (
@@ -83,11 +83,11 @@ CREATE TABLE `match_group` (
     `created_at` DATE NOT NULL,
     PRIMARY KEY (`match_group_id`)
 );
-ALTER TABLE match_group ADD INDEX idx_match_group_id (match_group_id );
+-- ALTER TABLE match_group ADD INDEX idx_match_group_id (match_group_id );
 
 CREATE TABLE `match_group_member` (
     `match_group_id` VARCHAR(36) NOT NULL,
     `user_id` VARCHAR(36) NOT NULL,
     PRIMARY KEY (`match_group_id`, `user_id`)
 );
-ALTER TABLE match_group_member ADD INDEX idx_user_id (user_id);
+-- ALTER TABLE match_group_member ADD INDEX idx_user_id (user_id);
