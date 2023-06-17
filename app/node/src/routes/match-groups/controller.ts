@@ -52,154 +52,81 @@ matchGroupRouter.post(
   }
 );
 
-// const isReqBodyTypeCorrect = (
-//   req: express.Request,
-//   res: express.Response
-// ): boolean => {
-//   if (
-//     req.body.matchGroupName === undefined ||
-//     typeof req.body.matchGroupName !== "string"
-//   ) {
-//     res.status(400).json({
-//       message: "マッチグループ名を文字列で指定してください。",
-//     });
-//     console.warn("matchGroupName is not specified or not string");
-//     return false;
-//   }
-//   if (
-//     req.body.description === undefined ||
-//     typeof req.body.description !== "string"
-//   ) {
-//     res.status(400).json({
-//       message: "マッチグループの説明を文字列で指定してください。",
-//     });
-//     console.warn("description is not specified or not string");
-//     return false;
-//   }
-//   if (
-//     req.body.numOfMembers === undefined ||
-//     typeof req.body.numOfMembers !== "number"
-//   ) {
-//     res.status(400).json({
-//       message: "作成したいマッチグループの人数を数値で指定してください。",
-//     });
-//     console.warn("numOfMembers is not specified or not number");
-//     return false;
-//   }
-//   if (
-//     req.body.departmentFilter === undefined ||
-//     typeof req.body.departmentFilter !== "string"
-//   ) {
-//     res.status(400).json({
-//       message: "マッチグループの部署フィルタを文字列で指定してください。",
-//     });
-//     console.warn("departmentFilter is not specified or not string");
-//     return false;
-//   }
-//   if (
-//     req.body.officeFilter === undefined ||
-//     typeof req.body.officeFilter !== "string"
-//   ) {
-//     res.status(400).json({
-//       message: "マッチグループのオフィスフィルタを文字列で指定してください。",
-//     });
-//     console.warn("officeFilter is not specified or not string");
-//     return false;
-//   }
-//   if (
-//     req.body.skillFilter === undefined ||
-//     !(
-//       Array.isArray(req.body.skillFilter) &&
-//       req.body.skillFilter.every((f: any) => typeof f === "string")
-//     )
-//   ) {
-//     res.status(400).json({
-//       message:
-//         "マッチグループのスキルフィルタを文字列の配列で指定してください。",
-//     });
-//     console.warn("skillFilter is not specified or not array");
-//     return false;
-//   }
-//   if (
-//     req.body.neverMatchedFilter === undefined ||
-//     typeof req.body.neverMatchedFilter !== "boolean"
-//   ) {
-//     res.status(400).json({
-//       message:
-//         "マッチグループのneverMatchedフィルタを真偽値で指定してください。",
-//     });
-//     console.warn("neverMatchedFilter is not specified or not boolean");
-//     return false;
-//   }
-// 
-//   return true;
-// };
-
 const isReqBodyTypeCorrect = (
   req: express.Request,
   res: express.Response
 ): boolean => {
-  const {
-    matchGroupName,
-    description,
-    numOfMembers,
-    departmentFilter,
-    officeFilter,
-    skillFilter,
-    neverMatchedFilter
-  } = req.body;
-
-  if (typeof matchGroupName !== "string") {
+  if (
+    req.body.matchGroupName === undefined ||
+    typeof req.body.matchGroupName !== "string"
+  ) {
     res.status(400).json({
       message: "マッチグループ名を文字列で指定してください。",
     });
     console.warn("matchGroupName is not specified or not string");
     return false;
   }
-
-  if (typeof description !== "string") {
+  if (
+    req.body.description === undefined ||
+    typeof req.body.description !== "string"
+  ) {
     res.status(400).json({
       message: "マッチグループの説明を文字列で指定してください。",
     });
     console.warn("description is not specified or not string");
     return false;
   }
-
-  if (typeof numOfMembers !== "number") {
+  if (
+    req.body.numOfMembers === undefined ||
+    typeof req.body.numOfMembers !== "number"
+  ) {
     res.status(400).json({
       message: "作成したいマッチグループの人数を数値で指定してください。",
     });
     console.warn("numOfMembers is not specified or not number");
     return false;
   }
-
-  if (typeof departmentFilter !== "string") {
+  if (
+    req.body.departmentFilter === undefined ||
+    typeof req.body.departmentFilter !== "string"
+  ) {
     res.status(400).json({
       message: "マッチグループの部署フィルタを文字列で指定してください。",
     });
     console.warn("departmentFilter is not specified or not string");
     return false;
   }
-
-  if (typeof officeFilter !== "string") {
+  if (
+    req.body.officeFilter === undefined ||
+    typeof req.body.officeFilter !== "string"
+  ) {
     res.status(400).json({
       message: "マッチグループのオフィスフィルタを文字列で指定してください。",
     });
     console.warn("officeFilter is not specified or not string");
     return false;
   }
-
-  if (!Array.isArray(skillFilter) || skillFilter.some((f: any) => typeof f !== "string")) {
+  if (
+    req.body.skillFilter === undefined ||
+    !(
+      Array.isArray(req.body.skillFilter) &&
+      req.body.skillFilter.every((f: any) => typeof f === "string")
+    )
+  ) {
     res.status(400).json({
-      message: "マッチグループのスキルフィルタを文字列の配列で指定してください。",
+      message:
+        "マッチグループのスキルフィルタを文字列の配列で指定してください。",
     });
     console.warn("skillFilter is not specified or not array");
     return false;
   }
-
-  if (typeof neverMatchedFilter !== "boolean") {
+  if (
+    req.body.neverMatchedFilter === undefined ||
+    typeof req.body.neverMatchedFilter !== "boolean"
+  ) {
     res.status(400).json({
-      message: "マッチグループのneverMatchedフィルタを真偽値で指定してください。",
+      message:
+        "マッチグループのneverMatchedフィルタを真偽値で指定してください。",
     });
     console.warn("neverMatchedFilter is not specified or not boolean");
     return false;
@@ -207,8 +134,6 @@ const isReqBodyTypeCorrect = (
 
   return true;
 };
-
-
 
 const isReqBodyValueCorrect = async (
   reqBody: MatchGroupConfig,
