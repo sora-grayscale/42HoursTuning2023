@@ -43,7 +43,7 @@ export const getUserIdsBeforeMatched = async (
   return userIdRows.map((row) => row.user_id);
 };
 
-export const insertMatchGroup = async (matchGroupDetail: MatchGroupDetail) => {
+/* export const insertMatchGroup = async (matchGroupDetail: MatchGroupDetail) => {
   await pool.query<RowDataPacket[]>(
     "INSERT INTO match_group (match_group_id, match_group_name, description, status, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?)",
     [
@@ -62,7 +62,35 @@ export const insertMatchGroup = async (matchGroupDetail: MatchGroupDetail) => {
       [matchGroupDetail.matchGroupId, member.userId]
     );
   }
+}; */
+
+
+export const insertMatchGroup = async (matchGroupDetail: MatchGroupDetail) => {
+  const connection = await pool.getConnection();
+  await connection.beginTransaction();
+
+  try {
+    const { matchGroupId, matchGroupName, description, status, createdBy, createdAt, members } = matchGroupDetail;
+
+    // match_groupテーブルへの一括挿入
+    const matchGroupQuery = "INSERT INTO match_group (match_group_id, match_group_name, description, status, created_by, created_at) VALUES ?";
+    const matchGroupValues = [[matchGroupId, matchGroupName, description, status, createdBy, createdAt]];
+    await connection.query<OkPacket>(matchGroupQuery, [matchGroupValues]);
+
+    // match_group_memberテーブルへの一括挿入
+    const memberValues = members.map((member) => [matchGroupId, member.userId]);
+    const matchGroupMemberQuery = "INSERT INTO match_group_member (match_group_id, user_id) VALUES ?";
+    await connection.query<OkPacket>(matchGroupMemberQuery, [memberValues]);
+
+    await connection.commit();
+  } catch (error) {
+    await connection.rollback();
+    throw error;
+  } finally {
+    connection.release();
+  }
 };
+
 
 /* export const getMatchGroupDetailByMatchGroupId = async (
   matchGroupId: string,
