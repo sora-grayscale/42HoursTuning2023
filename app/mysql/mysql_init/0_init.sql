@@ -62,6 +62,7 @@ CREATE TABLE `skill` (
     `skill_name` VARCHAR(50) NOT NULL,
     PRIMARY KEY (`skill_id`)
 );
+ALTER TABLE skill ADD INDEX idx_skill_name (skill_name);
 
 CREATE TABLE `skill_member` (
     `skill_id` VARCHAR(36) NOT NULL,
@@ -84,6 +85,6 @@ CREATE TABLE `match_group_member` (
     `user_id` VARCHAR(36) NOT NULL,
     PRIMARY KEY (`match_group_id`, `user_id`)
 );
+ALTER TABLE match_group_member ADD INDEX idx_user_id (user_id);
 
-ALTER TABLE skill ADD INDEX idx_skill_name (skill_name);
 
