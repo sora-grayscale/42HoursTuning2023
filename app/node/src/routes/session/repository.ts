@@ -6,18 +6,19 @@ import { convertDateToString } from "../../model/utils";
 export const getSessionByUserId = async (
   userId: string
 ): Promise<Session | undefined> => {
-  const [session] = await pool.query<RowDataPacket[]>(
-    "SELECT * FROM session WHERE linked_user_id = ?",
+  const [rows] = await pool.query<RowDataPacket[]>(
+    "SELECT session_id, linked_user_id, created_at FROM session WHERE linked_user_id = ?",
     [userId]
   );
-  if (session.length === 0) {
+  const session = rows[0];
+  if (!session) {
     return;
   }
 
   return {
-    sessionId: session[0].session_id,
-    userId: session[0].linked_user_id,
-    createdAt: convertDateToString(session[0].created_at),
+    sessionId: session.session_id,
+    userId: session.linked_user_id,
+    createdAt: convertDateToString(session.created_at),
   };
 };
 
@@ -26,30 +27,33 @@ export const createSession = async (
   userId: string,
   now: Date
 ) => {
+  const formattedDate = now.toISOString().slice(0, 10); // or use a database-specific date formatting function
   await pool.query(
     "INSERT INTO session (session_id, linked_user_id, created_at) VALUES (?, ?, ?)",
-    [sessionId, userId, now]
+    [sessionId, userId, formattedDate]
   );
 };
 
 export const getSessionBySessionId = async (
   sessionId: string
 ): Promise<Session | undefined> => {
-  const [session] = await pool.query<RowDataPacket[]>(
-    "SELECT * FROM session WHERE session_id = ?",
+  const [rows] = await pool.query<RowDataPacket[]>(
+    "SELECT session_id, linked_user_id, created_at FROM session WHERE session_id = ?",
     [sessionId]
   );
-  if (session.length === 0) {
+  const session = rows[0];
+  if (!session) {
     return;
   }
 
   return {
-    sessionId: session[0].session_id,
-    userId: session[0].linked_user_id,
-    createdAt: convertDateToString(session[0].created_at),
+    sessionId: session.session_id,
+    userId: session.linked_user_id,
+    createdAt: convertDateToString(session.created_at),
   };
 };
 
 export const deleteSessions = async (userId: string) => {
   await pool.query("DELETE FROM session WHERE linked_user_id = ?", [userId]);
 };
+
