@@ -7,8 +7,9 @@ export const getSessionByUserId = async (
   userId: string
 ): Promise<Session | undefined> => {
   const [session] = await pool.query<RowDataPacket[]>(
-    "SELECT * FROM session WHERE linked_user_id = ?",
-    [userId]
+	"SELECT session_id, created_at FROM `session` WHERE linked_user_id = ?",
+	[userId]
+
   );
   if (session.length === 0) {
     return;
@@ -36,8 +37,8 @@ export const getSessionBySessionId = async (
   sessionId: string
 ): Promise<Session | undefined> => {
   const [session] = await pool.query<RowDataPacket[]>(
-    "SELECT * FROM session WHERE session_id = ?",
-    [sessionId]
+	"SELECT session_id, linked_user_id, created_at FROM `session` WHERE session_id = ?",
+	[sessionId]
   );
   if (session.length === 0) {
     return;
