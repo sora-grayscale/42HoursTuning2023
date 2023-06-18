@@ -10,40 +10,50 @@ import {
   getUsersByGoal,
 } from "./repository";
 
+
 export const getUsersByKeyword = async (
   keyword: string,
   targets: Target[]
 ): Promise<SearchedUser[]> => {
-  let users: SearchedUser[] = [];
+  const searchPromises: Promise<SearchedUser[]>[] = [];
+
   for (const target of targets) {
-    const oldLen = users.length;
     switch (target) {
       case "userName":
-        users = users.concat(await getUsersByUserName(keyword));
+        searchPromises.push(getUsersByUserName(keyword));
         break;
       case "kana":
-        users = users.concat(await getUsersByKana(keyword));
+        searchPromises.push(getUsersByKana(keyword));
         break;
       case "mail":
-        users = users.concat(await getUsersByMail(keyword));
+        searchPromises.push(getUsersByMail(keyword));
         break;
       case "department":
-        users = users.concat(await getUsersByDepartmentName(keyword));
+        searchPromises.push(getUsersByDepartmentName(keyword));
         break;
       case "role":
-        users = users.concat(await getUsersByRoleName(keyword));
+        searchPromises.push(getUsersByRoleName(keyword));
         break;
       case "office":
-        users = users.concat(await getUsersByOfficeName(keyword));
+        searchPromises.push(getUsersByOfficeName(keyword));
         break;
       case "skill":
-        users = users.concat(await getUsersBySkillName(keyword));
+        searchPromises.push(getUsersBySkillName(keyword));
         break;
       case "goal":
-        users = users.concat(await getUsersByGoal(keyword));
+        searchPromises.push(getUsersByGoal(keyword));
         break;
     }
-    console.log(`${users.length - oldLen} users found by ${target}`);
   }
+
+  const searchResults = await Promise.all(searchPromises);
+  const users = searchResults.reduce((result, searchResult) => result.concat(searchResult), []);
+
+  for (let i = 0; i < targets.length; i++) {
+    const target = targets[i];
+    console.log(`${searchResults[i].length} users found by ${target}`);
+  }
+
   return users;
 };
+
