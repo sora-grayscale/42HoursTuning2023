@@ -22,17 +22,30 @@ export const getSessionByUserId = async (
   };
 };
 
+// export const createSession = async (
+//   sessionId: string,
+//   userId: string,
+//   now: Date
+// ) => {
+//   const formattedDate = now.toISOString().slice(0, 10); // or use a database-specific date formatting function
+//   await pool.query(
+//     "INSERT INTO session (session_id, linked_user_id, created_at) VALUES (?, ?, ?)",
+//     [sessionId, userId, formattedDate]
+//   );
+// };
+
 export const createSession = async (
   sessionId: string,
   userId: string,
   now: Date
 ) => {
-  const formattedDate = now.toISOString().slice(0, 10); // or use a database-specific date formatting function
-  await pool.query(
-    "INSERT INTO session (session_id, linked_user_id, created_at) VALUES (?, ?, ?)",
-    [sessionId, userId, formattedDate]
-  );
+  const formattedDate = now.toISOString().slice(0, 10);
+  const query = "INSERT INTO session (session_id, linked_user_id, created_at) VALUES (?, ?, ?)";
+  const values = [sessionId, userId, formattedDate];
+  await pool.query(query, values);
 };
+
+
 
 export const getSessionBySessionId = async (
   sessionId: string
