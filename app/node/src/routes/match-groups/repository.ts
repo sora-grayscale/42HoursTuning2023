@@ -8,7 +8,6 @@ export const hasSkillNameRecord = async (
   skillName: string
 ): Promise<boolean> => {
   const [rows] = await pool.query<RowDataPacket[]>(
-    // "SELECT * FROM skill WHERE EXISTS (SELECT * FROM skill WHERE skill_name = ?)",
     "SELECT skill_id FROM skill WHERE skill_name = ? LIMIT 1",
 
     [skillName]
@@ -35,26 +34,61 @@ export const getUserIdsBeforeMatched = async (
   return userIdRows.map((row) => row.user_id);
 };
 
-export const insertMatchGroup = async (matchGroupDetail: MatchGroupDetail) => {
-  await pool.query<RowDataPacket[]>(
-    "INSERT INTO match_group (match_group_id, match_group_name, description, status, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?)",
-    [
-      matchGroupDetail.matchGroupId,
-      matchGroupDetail.matchGroupName,
-      matchGroupDetail.description,
-      matchGroupDetail.status,
-      matchGroupDetail.createdBy,
-      matchGroupDetail.createdAt,
-    ]
-  );
+// export const insertMatchGroup = async (matchGroupDetail: MatchGroupDetail) => {
+//   await pool.query<RowDataPacket[]>(
+//     "INSERT INTO match_group (match_group_id, match_group_name, description, status, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?)",
+//     [
+//       matchGroupDetail.matchGroupId,
+//       matchGroupDetail.matchGroupName,
+//       matchGroupDetail.description,
+//       matchGroupDetail.status,
+//       matchGroupDetail.createdBy,
+//       matchGroupDetail.createdAt,
+//     ]
+//   );
+// 
+//   for (const member of matchGroupDetail.members) {
+//     await pool.query<RowDataPacket[]>(
+//       "INSERT INTO match_group_member (match_group_id, user_id) VALUES (?, ?)",
+//       [matchGroupDetail.matchGroupId, member.userId]
+//     );
+//   }
+// };
 
-  for (const member of matchGroupDetail.members) {
-    await pool.query<RowDataPacket[]>(
-      "INSERT INTO match_group_member (match_group_id, user_id) VALUES (?, ?)",
-      [matchGroupDetail.matchGroupId, member.userId]
+export const insertMatchGroup = async (matchGroupDetail: MatchGroupDetail) => {
+  const connection = await pool.getConnection();
+  await connection.beginTransaction();
+
+  try {
+    await connection.query(
+      "INSERT INTO match_group (match_group_id, match_group_name, description, status, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?)",
+      [
+        matchGroupDetail.matchGroupId,
+        matchGroupDetail.matchGroupName,
+        matchGroupDetail.description,
+        matchGroupDetail.status,
+        matchGroupDetail.createdBy,
+        matchGroupDetail.createdAt,
+      ]
     );
+
+    for (const member of matchGroupDetail.members) {
+      await connection.query(
+        "INSERT INTO match_group_member (match_group_id, user_id) VALUES (?, ?)",
+        [matchGroupDetail.matchGroupId, member.userId]
+      );
+    }
+
+    await connection.commit();
+  } catch (error) {
+    await connection.rollback();
+    throw error;
+  } finally {
+    connection.release();
   }
 };
+
+
 
 export const getMatchGroupDetailByMatchGroupId = async (
   matchGroupId: string,
