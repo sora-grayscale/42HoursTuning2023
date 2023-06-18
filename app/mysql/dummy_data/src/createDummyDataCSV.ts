@@ -129,7 +129,25 @@ const createUsers = () => {
   fs.appendFileSync("/csv/user_init.csv", stringify(users));
 };
 
-const createSkillMembers = () => {
+// const createSkillMembers = () => {
+//   let skillMembers: SkillMember[] = [];
+// 
+//   for (const user of users) {
+//     const skillNum = 3;
+//     const skillIdIndex = getRandomInt(0, skillNames.length - 3);
+//     for (let i = 0; i < skillNum; i++) {
+//       skillMembers.push({
+//         // skillsのindex番目から連続してskillNum個分のスキルを登録
+//         skill_id: skills[skillIdIndex + i].skill_id,
+//         user_id: user.user_id,
+//       });
+//     }
+//   }
+// 
+//   fs.appendFileSync("/csv/skill_member_init.csv", stringify(skillMembers));
+// };
+
+const createSkillMembers = async () => {
   let skillMembers: SkillMember[] = [];
 
   for (const user of users) {
@@ -137,15 +155,17 @@ const createSkillMembers = () => {
     const skillIdIndex = getRandomInt(0, skillNames.length - 3);
     for (let i = 0; i < skillNum; i++) {
       skillMembers.push({
-        // skillsのindex番目から連続してskillNum個分のスキルを登録
         skill_id: skills[skillIdIndex + i].skill_id,
         user_id: user.user_id,
       });
     }
   }
 
-  fs.appendFileSync("/csv/skill_member_init.csv", stringify(skillMembers));
+  const csvData = stringify(skillMembers);
+  await fs.promises.appendFile("/csv/skill_member_init.csv", csvData);
 };
+
+
 
 const createDepartmentRoleMembers = () => {
   let departmentRoleMembers: DepartmentRoleMember[] = [];
