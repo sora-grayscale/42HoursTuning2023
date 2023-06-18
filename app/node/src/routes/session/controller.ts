@@ -15,7 +15,7 @@ import { hashPassword } from "./passwordUtils";
 
 export const sessionRouter = express.Router();
 
-ログインAPI
+// ログインAPI
 sessionRouter.post(
   "/",
   async (
