@@ -167,59 +167,18 @@ const createSkillMembers = () => {
 
 
 
-// const createDepartmentRoleMembers = () => {
-//   let departmentRoleMembers: DepartmentRoleMember[] = [];
-// 
-//   users.forEach((user, index) => {
-//     // 2年に一度異動
-//     const transferNum = ((2023 - Number(user.entry_date.slice(0, 4))) / 2) | 0;
-//     const assignNum = transferNum + 1;
-//     for (let i = 0; i < assignNum; i++) {
-//       const departmentIndex =
-//         i === transferNum
-//           ? departments.length / 2 + (index % (departments.length / 2)) // 最新の所属部署はactive = true
-//           : getRandomInt(0, departments.length - 1);
-//       departmentRoleMembers.push({
-//         department_id: departments[departmentIndex].department_id,
-//         role_id:
-//           i === transferNum
-//             ? roles[getRoleIndex(index)].role_id
-//             : roles[getWeightedRoleIndex()].role_id,
-//         user_id: user.user_id,
-//         entry_date:
-//           (Number(user.entry_date.slice(0, 4)) + 2 * i).toString() + "-04-01",
-//         belong: i === transferNum, // 最新の所属部署はbelong = true
-//       });
-//       // 100万件ごとにcsvに書き出す
-//       if (departmentRoleMembers.length >= 1000000) {
-//         fs.appendFileSync(
-//           "/csv/department_role_member_init.csv",
-//           stringify(departmentRoleMembers)
-//         );
-//         departmentRoleMembers = [];
-//       }
-//     }
-//   });
-// 
-//   fs.appendFileSync(
-//     "/csv/department_role_member_init.csv",
-//     stringify(departmentRoleMembers)
-//   );
-// };
-
-const createDepartmentRoleMembers = async () => {
+const createDepartmentRoleMembers = () => {
   let departmentRoleMembers: DepartmentRoleMember[] = [];
 
   users.forEach((user, index) => {
+    // 2年に一度異動
     const transferNum = ((2023 - Number(user.entry_date.slice(0, 4))) / 2) | 0;
     const assignNum = transferNum + 1;
-
     for (let i = 0; i < assignNum; i++) {
       const departmentIndex =
         i === transferNum
-          ? departments.length / 2 + (index % (departments.length / 2))
+          ? departments.length / 2 + (index % (departments.length / 2)) // 最新の所属部署はactive = true
           : getRandomInt(0, departments.length - 1);
-
       departmentRoleMembers.push({
         department_id: departments[departmentIndex].department_id,
         role_id:
@@ -227,23 +186,26 @@ const createDepartmentRoleMembers = async () => {
             ? roles[getRoleIndex(index)].role_id
             : roles[getWeightedRoleIndex()].role_id,
         user_id: user.user_id,
-        entry_date: (Number(user.entry_date.slice(0, 4)) + 2 * i).toString() + "-04-01",
-        belong: i === transferNum,
+        entry_date:
+          (Number(user.entry_date.slice(0, 4)) + 2 * i).toString() + "-04-01",
+        belong: i === transferNum, // 最新の所属部署はbelong = true
       });
-
+      // 100万件ごとにcsvに書き出す
       if (departmentRoleMembers.length >= 1000000) {
-        const csvData = stringify(departmentRoleMembers);
-        await fs.promises.appendFile("/csv/department_role_member_init.csv", csvData);
+        fs.appendFileSync(
+          "/csv/department_role_member_init.csv",
+          stringify(departmentRoleMembers)
+        );
         departmentRoleMembers = [];
       }
     }
   });
 
-  const csvData = stringify(departmentRoleMembers);
-  await fs.promises.appendFile("/csv/department_role_member_init.csv", csvData);
+  fs.appendFileSync(
+    "/csv/department_role_member_init.csv",
+    stringify(departmentRoleMembers)
+  );
 };
-
-
 
 const createMatchGroups = () => {
   let matchGroups: MatchGroup[] = [];
